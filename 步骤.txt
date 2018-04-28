@@ -1,0 +1,30 @@
+一、创建zookeeper集群
+1、下载镜像，注意下版本，时间差导致last版本不一致
+docker pull zookeeper
+2、创建集群
+进入docker-file/zookeeper-cluster下
+docker-compose --project-name zk_cluster up 
+3、查看集群
+docker-compose --project-name zk_cluster ps
+显示zk_cluster下的镜像
+echo stat | nc 127.0.0.1 2181
+显示该容器，是follower，还是leader
+注：windows下nc命令不可用，可下载安装
+二、创建kafka集群
+1、下载镜像
+docker pull wurstmeister/kafka
+2、创建集群
+进入docker-file/kafka-cluster下
+注：将docker-compose.yml下的192.168.5.108改为物理机的IP
+docker-compose --project-name kafka_cluster up
+或
+docker-compose --project-name kafka_cluster up -d #后台运行
+3、创建topic
+docker exec -i -t  kafka1 /opt/kafka/bin/kafka-topics.sh --create --zookeeper 192.168.5.108:2181 --replication-factor 3 --partitions 3 --topic testtopic
+三、运行demo中 MyKfkConsumer、MyKfkProducer
+
+
+
+other
+可用ZooInspector连接zookeeper查看，解压进入build下  
+java -jar zookeeper-dev-ZooInspector.jar
