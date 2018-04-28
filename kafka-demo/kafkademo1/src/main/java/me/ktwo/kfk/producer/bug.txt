@@ -1,0 +1,38 @@
+一、kafka.common.UnknownTopicOrPartitionException: This server does not host this topic-partition.
+
+1、boker.id配置错误
+
+2、这是由于删除topic没删干净
+
+在zookeeper里删除下列路径下的数据：
+/brokers/topics/[topic]
+/consumers/[groupId]/owners/[topic]
+/consumers/[groupId]/offsets/[topic]
+
+重启kafka集群
+二、Expiring 31 record(s) for JAVA_TOPIC-0: 30065 ms has passed since batch creation plus linger time
+1、增大 batch.size 或 减少 buffer.memory,更改Producer参数（具体数值请根据实际情况）
+batch.size=65536
+buffer.memory=524288
+
+2、查看zookeeper下面的 /brokers/topics/[topic]的分区是否创建命令行指定的数目一直，或某种操作误删一个分区导致0这个分区不存在
+
+三、org.apache.kafka.common.errors.NotLeaderForPartitionException
+
+1、可能中bootstrap.servers的list，有部分不可用或配置错误
+
+2、该异常是由kafka集群broker节点发送变化导致，在producer端配置失败重试次数(retries=3,默认retries=0),
+
+3、
+增大session的timeout时间
+可有效缓解（但系统依旧”卡顿“，影响性能），将初始值更改为30s，在 server.properties 中：
+zookeeper.session.timeout.ms=30000
+
+增加磁盘IO处理线程数（具体数值请根据实际情况）
+在 server.properties 中：
+num.io.threads=12
+
+增加 log 数据盘数（具体数值请根据实际情况）
+在每台机器上多挂载几个盘，更改 kafka 的 server.properties 参数：
+
+log.dirs=/mnt/datadir1/kafka-logs-0,/mnt/datadir2/kafka-logs-0,/mnt/datadir3/kafka-logs-0
