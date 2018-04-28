@@ -1,23 +1,21 @@
-package me.ktwo.kfk.consumer;
+package me.ktwo.kfk_pojo;
 
 
-import me.ktwo.kfk.producer.MyKfkProducer;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
-
+import java.io.IOException;
 import java.util.Arrays;
-
 import java.util.Properties;
 
-public class MyKfkConsumer {
+public class BookKfkConsumer {
 
     private KafkaConsumer<String, String> consumer;
 
 
-    public MyKfkConsumer() {
+    public BookKfkConsumer() {
         Properties props = new Properties();
         props.put("bootstrap.servers", "127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094");
         props.put("group.id", "test");
@@ -29,16 +27,24 @@ public class MyKfkConsumer {
     }
 
     void consume(){
-        consumer.subscribe(Arrays.asList(MyKfkProducer.TOPIC));
+        consumer.subscribe(Arrays.asList(BookKfkProducer.TOPIC));
         System.out.println("in topic");
         while (true) {
-            ConsumerRecords<String, String> records = consumer.poll(100);;
-            for (ConsumerRecord<String, String> record : records)
+            ConsumerRecords<String, String> records = consumer.poll(500);;
+            for (ConsumerRecord<String, String> record : records) {
                 System.out.printf("offset = %d, key = %s, value = %s%n", record.offset(), record.key(), record.value());
+                ObjectMapper mapper = new ObjectMapper();
+                try {
+                    Book book = mapper.readValue(record.value(),Book.class);
+                    System.out.println(book);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
     public static void main(String[] args) {
-        new MyKfkConsumer().consume();
+        new BookKfkConsumer().consume();
     }
 
 
