@@ -21,7 +21,8 @@ public class MyKfkProducer {
     private Producer<String,String> createKafkaProducer(){
         Properties props = new Properties();
         props.put("bootstrap.servers", "192.168.5.108:9092,192.168.5.108:9093,192.168.5.108:9094");
-        props.put("acks", "all");
+        //props.put("acks", "all");
+        props.put(ProducerConfig.ACKS_CONFIG,"all");
         props.put("retries", 3);
         props.put("batch.size", 5);// 批次数量
         props.put("linger.ms", 1);
