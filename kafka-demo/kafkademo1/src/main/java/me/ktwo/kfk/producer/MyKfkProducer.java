@@ -30,6 +30,7 @@ public class MyKfkProducer {
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 
+
         Producer<String, String> kafkaProducer = new KafkaProducer<>(props);
         System.out.println("createKafkaProducer over");
         return kafkaProducer;
